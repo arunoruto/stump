@@ -318,6 +318,19 @@ fn apply_media_fields(
 		active.summary = Set(v);
 	}
 
+	if let Some(v) =
+		merger.merge_scalar(MetadataField::Series, &model.series, &ext.series_name)
+	{
+		active.series = Set(v);
+	}
+
+	let ext_number = ext.number.and_then(Decimal::from_f32);
+	if let Some(v) =
+		merger.merge_scalar(MetadataField::Number, &model.number, &ext_number)
+	{
+		active.number = Set(v);
+	}
+
 	if let Some(v) = merger.merge_scalar(MetadataField::Year, &model.year, &ext.year) {
 		active.year = Set(v);
 	}
@@ -394,6 +407,12 @@ fn apply_media_fields(
 	if let Some(v) = merger.apply_scalar_override::<String>(MetadataField::Summary) {
 		active.summary = Set(v);
 	}
+	if let Some(v) = merger.apply_scalar_override::<String>(MetadataField::Series) {
+		active.series = Set(v);
+	}
+	if let Some(v) = merger.apply_scalar_override::<Decimal>(MetadataField::Number) {
+		active.number = Set(v);
+	}
 	if let Some(v) = merger.apply_scalar_override::<i32>(MetadataField::Year) {
 		active.year = Set(v);
 	}
@@ -465,6 +484,8 @@ fn build_media_metadata_insert(
 		media_id: Set(Some(media_id.to_string())),
 		title: Set(ext.title.clone()),
 		summary: Set(ext.summary.clone()),
+		series: Set(ext.series_name.clone()),
+		number: Set(ext.number.and_then(Decimal::from_f32)),
 		year: Set(ext.year),
 		day: Set(ext.day),
 		month: Set(ext.month),

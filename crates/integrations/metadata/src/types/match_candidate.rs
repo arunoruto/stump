@@ -29,3 +29,21 @@ pub struct ConfidenceFactor {
 	/// Whether this factor matched
 	pub matched: bool,
 }
+
+/// The result of a provider search: the candidates that were successfully
+/// resolved, plus how many raw hits the search itself reported. Providers
+/// like Hardcover require a separate per-hit detail fetch after the initial
+/// search, and any of those can fail (e.g. rate limiting) without failing
+/// the whole search -- `requested` lets callers detect when hits were
+/// silently dropped instead of just seeing a shorter-than-expected list.
+#[derive(Debug, Clone, Default)]
+pub struct SearchOutcome {
+	pub candidates: Vec<MatchCandidate>,
+	pub requested: usize,
+}
+
+impl SearchOutcome {
+	pub fn failed(&self) -> usize {
+		self.requested.saturating_sub(self.candidates.len())
+	}
+}
